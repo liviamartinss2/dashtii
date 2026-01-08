@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-br" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+
+  <title>Painel GLPI</title>
+
+  <link rel="stylesheet" href="styles.css?v=1" />
+  <script src="app.js?v=1" defer></script>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <div class="title">
+          <h1>Painel GLPI</h1>
+          <p>Cards por atendente (Fora / No Período / Pendente)</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="chip">
+          Tipo
+          <select id="fTipo">
+            <option value="BACKLOG">BACKLOG</option>
+            <option value="ENCERRADOS">ENCERRADOS</option>
+            <option value="ALL">ALL</option>
+          </select>
+        </div>
+
+        <div class="chip">
+          Ano
+          <input id="fAno" type="number" min="2020" max="2100" placeholder="2026" style="width:92px" />
+        </div>
+
+        <div class="chip">
+          Mês
+          <select id="fMes">
+            <option value="">—</option>
+            <option value="1">JAN</option>
+            <option value="2">FEV</option>
+            <option value="3">MAR</option>
+            <option value="4">ABR</option>
+            <option value="5">MAI</option>
+            <option value="6">JUN</option>
+            <option value="7">JUL</option>
+            <option value="8">AGO</option>
+            <option value="9">SET</option>
+            <option value="10">OUT</option>
+            <option value="11">NOV</option>
+            <option value="12">DEZ</option>
+          </select>
+        </div>
+
+        <div class="chip">
+          Técnico
+          <select id="fTech">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <button id="btnTheme" type="button">🌙/☀️</button>
+        <button id="btnApply" type="button">Atualizar</button>
+      </div>
+    </header>
+
+    <!-- ✅ GERAL PRIMEIRO -->
+    <section class="section">
+      <div class="section-head">
+        <h2>GERAL</h2>
+        <div class="right-actions">
+          <div class="search">
+            🔎 <input id="searchTech" placeholder="Buscar atendente..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="section-body">
+        <div class="grid-12" id="kpis">
+          <!-- KPIs renderizados pelo JS -->
+        </div>
+
+        <div style="margin-top:14px">
+          <div class="section" style="margin-top:0">
+            <div class="section-head"><h2>⭐ Sem avaliação / ⚠ Sem complexidade</h2></div>
+            <div class="section-body">
+
+              <div class="hint">Sem avaliação: copiar mensagem com link do chamado</div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Título</th><th>Técnico</th><th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tbPendingEvals"></tbody>
+              </table>
+
+              <div class="pager" id="pagerPendingEvals">
+                <button type="button" id="pendPrev">←</button>
+                <span class="pager-info" id="pendInfo">—</span>
+                <button type="button" id="pendNext">→</button>
+                <select id="pendSize">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+
+              <div class="divider"></div>
+
+              <div style="height:12px"></div>
+
+              <div class="hint">Demandas (categorias listadas) sem complexidade preenchida</div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Título</th><th>Técnico</th><th>Categoria</th>
+                  </tr>
+                </thead>
+                <tbody id="tbNoComplex"></tbody>
+              </table>
+
+              <div class="pager" id="pagerNoComplex">
+                <button type="button" id="ncPrev">←</button>
+                <span class="pager-info" id="ncInfo">—</span>
+                <button type="button" id="ncNext">→</button>
+                <select id="ncSize">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ✅ DETALHE NO MEIO -->
+    <section class="section">
+      <div class="section-head">
+        <h2>DETALHE DO ATENDENTE</h2>
+        <div class="hint">Vence hoje / semana + pendências</div>
+      </div>
+      <div class="section-body">
+        <div id="techDetail" class="muted">Selecione um atendente na visão de cards 👇</div>
+      </div>
+    </section>
+
+    <!-- ✅ VISÃO POR ATENDENTE (cards) NO FINAL -->
+    <section class="section">
+      <div class="section-head">
+        <h2>VISÃO POR ATENDENTE (cards)</h2>
+        <div class="hint">Clique em um card para abrir o detalhe</div>
+      </div>
+      <div class="section-body">
+        <div class="overview" id="techGrid"></div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
