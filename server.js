@@ -56,12 +56,14 @@ function monthWindow(ano, mes) {
  * - Demanda por lista de categorias
  * - Complexidade via plugin fields (glpi_plugin_fields_tickettickets.items_id)
  */
+
 const SQL_DATASET_BASE = `
 SELECT
   t.id                         AS ticket_id,
   t.name                       AS titulo,
   t.type                       AS tipo_ticket,         -- 1 incidente, 2 requisição
   t.status                     AS status_ticket,
+  t.time_to_resolve            AS time_to_resolve,
 
   t.date                       AS dt_abertura,
   t.takeintoaccountdate        AS dt_atendimento,
@@ -142,35 +144,36 @@ END AS complexidade_pendente,
   CASE WHEN t.time_to_own IS NULL OR t.takeintoaccountdate IS NULL THEN NULL
        WHEN t.takeintoaccountdate <= t.time_to_own THEN 1 ELSE 0 END AS atendimento_cumpriu_sla,
 
-  -- SLA Solução (TTR)
+   -- SLA Solução (TTR)
   (t.time_to_resolve IS NULL) AS sla_solucao_faltando,
   CASE WHEN t.time_to_resolve IS NULL THEN NULL WHEN NOW() >  t.time_to_resolve THEN 1 ELSE 0 END AS solucao_fora_prazo,
   CASE WHEN t.time_to_resolve IS NULL THEN NULL WHEN NOW() <= t.time_to_resolve THEN 1 ELSE 0 END AS solucao_no_prazo,
   CASE WHEN t.time_to_resolve IS NULL THEN NULL WHEN DATE(t.time_to_resolve) = CURDATE() THEN 1 ELSE 0 END AS solucao_vence_hoje,
-  CASE WHEN t.time_to_resolve IS NULL THEN NULL WHEN t.time_to_resolve > NOW() AND t.time_to_resolve < NOW() + INTERVAL 7 DAY THEN 1 ELSE 0 END AS solucao_vence_7d,
-  CASE WHEN t.time_to_resolve IS NULL THEN NULL WHEN t.time_to_resolve < NOW() - INTERVAL 30 DAY THEN 1 ELSE 0 END AS solucao_vencidos_mais_30d,
+  CASE WHEN t.time_to_resolve IS NULL THEN NULL WHEN t.time_to_resolve > NOW() AND t.time_to_resolve < DATE_ADD(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END AS solucao_vence_7d,
+  CASE WHEN t.time_to_resolve IS NULL THEN NULL WHEN t.time_to_resolve < DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END AS solucao_vencidos_mais_30d,
   CASE WHEN t.time_to_resolve IS NULL OR t.solvedate IS NULL THEN NULL
-       WHEN t.solvedate <= t.time_to_resolve THEN 1 ELSE 0 END AS solucao_cumpriu_sla
+       WHEN t.solvedate <= t.time_to_resolve THEN 1 ELSE 0 END AS solucao_cumpriu_sla,
 
-       -- Buckets de ATENDIMENTO (baseado no time_to_own)
-CASE
-  WHEN t.time_to_own IS NULL THEN NULL
-  WHEN t.time_to_own < NOW() - INTERVAL 30 DAY THEN 1
-  ELSE 0
-END AS own_vencidos_mais_30d,
+  -- Buckets de ATENDIMENTO (baseado no time_to_own)  (opcional, mas agora sem erro)
+  CASE
+    WHEN t.time_to_own IS NULL THEN NULL
+    WHEN t.time_to_own < DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1
+    ELSE 0
+  END AS own_vencidos_mais_30d,
 
-CASE
-  WHEN t.time_to_own IS NULL THEN NULL
-  WHEN DATE(t.time_to_own) = CURDATE() THEN 1
-  ELSE 0
-END AS own_vence_hoje,
+  CASE
+    WHEN t.time_to_own IS NULL THEN NULL
+    WHEN DATE(t.time_to_own) = CURDATE() THEN 1
+    ELSE 0
+  END AS own_vence_hoje,
 
-CASE
-  WHEN t.time_to_own IS NULL THEN NULL
-  WHEN t.time_to_own > NOW()
-   AND t.time_to_own < NOW() + INTERVAL 7 DAY THEN 1
-  ELSE 0
-END AS own_vence_7d
+  CASE
+    WHEN t.time_to_own IS NULL THEN NULL
+    WHEN t.time_to_own > NOW()
+     AND t.time_to_own < DATE_ADD(NOW(), INTERVAL 7 DAY) THEN 1
+    ELSE 0
+  END AS own_vence_7d
+
 
 
 FROM glpi_tickets t

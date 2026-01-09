@@ -482,10 +482,25 @@ function renderTechGrid(rows) {
 }
 
 function isSlaSolucaoVazia(r){
-  const ttrId = n0(r.slas_id_ttr ?? r.sla_ttr_id ?? r.sla_id_ttr);
-  const hasDeadline = !!(r.dt_limite_resolver || r.time_to_resolve || r.dt_limite_solucao);
-  return (ttrId === 0) || !hasDeadline;
+  // Campo do GLPI: "Tempo para solução" => glpi_tickets.time_to_resolve
+  const v = r.time_to_resolve ?? r.dt_limite_resolver ?? r.dt_limite_solucao;
+
+  // Se o backend nem mandou o campo, não dá pra afirmar que é vazio:
+  // aí a gente só usa como fallback o id do SLA (se existir).
+  if (v === undefined) {
+    const ttrId = n0(r.slas_id_ttr ?? r.sla_ttr_id ?? r.sla_id_ttr);
+    return ttrId === 0;
+  }
+
+  // Quando vem string/data:
+  if (v === null || v === "") return true;
+
+  // Alguns setups retornam "0000-00-00 00:00:00" como "vazio"
+  if (typeof v === "string" && v.startsWith("0000-00-00")) return true;
+
+  return false; // tem tempo para solução, então NÃO é vazio
 }
+
 
 // ===============================
 // ✅ Detalhe do técnico (com paginação nas listas também)
