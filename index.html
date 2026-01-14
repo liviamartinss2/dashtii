@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="pt-br" data-theme="dark">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -35,8 +36,9 @@
 
         <div class="chip">
           Ano
-          <input id="fAno" type="number" min="2020" max="2100" placeholder="2026" style="width:92px" />
+          <select id="fAno"></select>
         </div>
+
 
         <div class="chip">
           Mês
@@ -87,14 +89,19 @@
 
         <div style="margin-top:14px">
           <div class="section" style="margin-top:0">
-            <div class="section-head"><h2>⭐ Sem avaliação / ⚠ Sem complexidade</h2></div>
+            <div class="section-head">
+              <h2>⭐ Sem avaliação / ⚠ Sem complexidade</h2>
+            </div>
             <div class="section-body">
 
               <div class="hint">Sem avaliação: copiar mensagem com link do chamado</div>
               <table class="table">
                 <thead>
                   <tr>
-                    <th>#</th><th>Título</th><th>Técnico</th><th>Ação</th>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Técnico</th>
+                    <th>Ação</th>
                   </tr>
                 </thead>
                 <tbody id="tbPendingEvals"></tbody>
@@ -119,7 +126,10 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th>#</th><th>Título</th><th>Técnico</th><th>Categoria</th>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Técnico</th>
+                    <th>Categoria</th>
                   </tr>
                 </thead>
                 <tbody id="tbNoComplex"></tbody>
@@ -167,4 +177,5 @@
 
   </div>
 </body>
+
 </html>

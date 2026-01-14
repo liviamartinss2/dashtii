@@ -1,5 +1,5 @@
 :root{
-      --bg: #0b1220;
+      --bg: #647495;
       --panel:#0f1a2e;
       --card:#0f1f3a;
       --muted:#8ea0c2;
@@ -277,6 +277,7 @@
       display:flex;
       align-items:center;
       gap: 6px;
+      flex-direction: column;
     }
     .split{
       display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;

@@ -84,6 +84,36 @@ let state = {
   selectedTechId: null,
 };
 
+function uniqueSortedYears(rows){
+  const years = new Set();
+  for (const r of rows || []) {
+    // tenta pegar de campos comuns (ajuste se seu backend usar outro nome)
+    const dt = r.date || r.dt_abertura || r.data_abertura || r.createdate || r.abertura;
+    if (!dt) continue;
+    const y = new Date(dt).getFullYear();
+    if (!Number.isNaN(y)) years.add(y);
+  }
+  return [...years].sort((a,b) => b - a);
+}
+
+function fillAnoDropdown(years){
+  const nowY = new Date().getFullYear();
+  const selected = (elAno?.value && elAno.value !== "") ? Number(elAno.value) : nowY;
+
+  // fallback: se não veio nenhum ano do dataset, cria um range “bonzinho”
+  const list = (years && years.length)
+    ? years
+    : Array.from({length: 7}, (_, i) => nowY - i); // agora até -6
+
+  elAno.innerHTML =
+    `<option value="">Todos</option>` +
+    list.map(y => `<option value="${y}">${y}</option>`).join("");
+
+  // tenta manter seleção anterior
+  if (list.includes(selected)) elAno.value = String(selected);
+}
+
+
 const dash = (v) => (v === null || v === undefined || v === "" ? "—" : v);
 const n0 = (v) => (v === null || v === undefined || Number.isNaN(Number(v)) ? 0 : Number(v));
 
@@ -773,7 +803,7 @@ async function loadData() {
     const params = new URLSearchParams();
     params.set("tipo", elTipo?.value || "BACKLOG");
 
-    const ano = elAno?.value?.toString().trim();
+    const ano = elAno?.value || "";
     const mes = elMes?.value?.toString().trim();
 
     if (ano) params.set("ano", ano);
@@ -788,6 +818,9 @@ async function loadData() {
 
     state.baseUrl = data.baseUrl;
     state.rows = data.rows || [];
+    // Preenche o dropdown de anos com base nos dados retornados
+    fillAnoDropdown(uniqueSortedYears(state.rows));
+
 
     // ✅ agora o copiar funciona (antes não existia)
     window.__copyEval = async (ticketId) => {
